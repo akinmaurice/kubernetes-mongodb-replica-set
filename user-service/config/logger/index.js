@@ -1,5 +1,6 @@
 const winston = require('winston');
 const moment = require('moment');
+const { SERVICE_NAME } = require('../index');
 
 
 const prettyJson = winston.format.printf(info => {
@@ -24,7 +25,7 @@ const jsonCombineFormat = winston.format.combine(
 
 const logger = () => {
     const ret = winston.createLogger({
-        defaultMeta: { service: 'user-service' },
+        defaultMeta: { service: SERVICE_NAME },
         transports: [
             new winston.transports.Console({
                 format: consoleCombineFormat,
