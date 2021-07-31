@@ -1,0 +1,12 @@
+
+.DS_Store
+npm-debug.log
+node_modules/
+coverage/
+checkstyle-result.xml
+*.log
+*.env
+.nyc_output/
+tmp/
+dist
+*.lcov
