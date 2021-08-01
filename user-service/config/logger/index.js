@@ -1,6 +1,6 @@
 const winston = require('winston');
 const moment = require('moment');
-const { SERVICE_NAME } = require('../index');
+const config = require('../index');
 
 
 const prettyJson = winston.format.printf(info => {
@@ -25,7 +25,10 @@ const jsonCombineFormat = winston.format.combine(
 
 const logger = () => {
     const ret = winston.createLogger({
-        defaultMeta: { service: SERVICE_NAME },
+        defaultMeta: { 
+            service: config.SERVICE_NAME,
+            env: config.env,
+         },
         transports: [
             new winston.transports.Console({
                 format: consoleCombineFormat,
@@ -42,7 +45,7 @@ const logger = () => {
                 json: true,
                 maxsize: 5242880,
                 maxFiles: 100,
-                colorize: true
+                colorize: true,
             })
         ],
         exitOnError: false

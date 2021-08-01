@@ -1,5 +1,5 @@
 const logError = (name, error) => {
-    logger.error(`${name}: ${error}`);
+    logger.error(name, { error });
 }
 
 

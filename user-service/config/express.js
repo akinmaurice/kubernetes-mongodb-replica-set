@@ -21,7 +21,8 @@ const expressConfig = (app) => {
 
     logger.info(`${config.SERVICE_NAME} API starting...`);
     logger.debug("Overriding 'Express' logger");
-    errorHandler('ExpressErrorTest','Testing Error is logged');
+    errorHandler('StringErrorTest', 'Testing String error is logged');
+    errorHandler('StackTraceErrortest', new Error('Testing Error object is logged'));
 
 
     if (checkLogDir) {
