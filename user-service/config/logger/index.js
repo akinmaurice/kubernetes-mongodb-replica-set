@@ -36,37 +36,76 @@ const jsonCombineFormat = winston.format.combine(
 
 
 const logger = () => {
-    const ret = winston.createLogger({
+    const env = config.env;
+    let ret = winston.createLogger({
         defaultMeta: { 
             service: config.SERVICE_NAME,
-            env: config.env,
+            env,
          },
         transports: [],
         exitOnError: false
     });
 
-    if (config.env === 'development') {
-        ret.add(
-            new winston.transports.Console({
-                format: consoleCombineFormat,
-                level: 'debug',
-                handleExceptions: true,
-                json: false,
-                colorize: true
-            }),
-        );
-        ret.add(
-            new winston.transports.File({
-                format: jsonCombineFormat,
-                level: 'debug',
-                filename: './server.log',
-                handleExceptions: true,
-                json: true,
-                maxsize: 5242880,
-                maxFiles: 100,
-                colorize: false,
-            }));
-    }
+    switch (env) {
+        case 'production':
+            ret.add(
+                new winston.transports.File({
+                    format: jsonCombineFormat,
+                    level: 'debug',
+                    filename: './server.log',
+                    handleExceptions: true,
+                    json: true,
+                    maxsize: 5242880,
+                    maxFiles: 100,
+                    colorize: false,
+                }));
+            break;
+        case 'development':
+            ret.add(
+                new winston.transports.Console({
+                    format: consoleCombineFormat,
+                    level: 'debug',
+                    handleExceptions: true,
+                    json: false,
+                    colorize: true
+                }),
+            );
+            ret.add(
+                new winston.transports.File({
+                    format: jsonCombineFormat,
+                    level: 'debug',
+                    filename: './server.log',
+                    handleExceptions: true,
+                    json: true,
+                    maxsize: 5242880,
+                    maxFiles: 100,
+                    colorize: false,
+                }));
+            break;
+        case 'staging':
+            ret.add(
+                new winston.transports.File({
+                    format: jsonCombineFormat,
+                    level: 'debug',
+                    filename: './server.log',
+                    handleExceptions: true,
+                    json: true,
+                    maxsize: 5242880,
+                    maxFiles: 100,
+                    colorize: false,
+                }));
+            break;
+        default:
+            ret.add(
+                new winston.transports.Console({
+                    format: consoleCombineFormat,
+                    level: 'debug',
+                    handleExceptions: true,
+                    json: false,
+                    colorize: true
+                }),
+            );
+}
 
     ret.stream = {
         write: (message) => {
