@@ -15,7 +15,7 @@ app.listen(port);
 logger.info(`Server started on Port ${port}`);
 
 process.on('unhandledRejection', (reason) => {
-    logger.error('unhandledRejection',{ reason });
+    errorHandler('unhandledRejection'+ reason);
 });
 
 module.exports = app;
