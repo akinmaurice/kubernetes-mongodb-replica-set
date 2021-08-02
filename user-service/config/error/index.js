@@ -1,10 +1,10 @@
-const logError = (name, error) => {
-    logger.error(name, { error });
+const logError = (error) => {
+    logger.error(error);
 }
 
 
-const errorHandler = async(name, error) => {
-    logError(name, error);
+const errorHandler = async(error) => {
+    logError(error);
 };
 
 
