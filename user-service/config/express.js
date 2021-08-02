@@ -21,8 +21,6 @@ const expressConfig = (app) => {
 
     logger.info(`${config.SERVICE_NAME} API starting...`);
     logger.debug("Overriding 'Express' logger");
-    errorHandler('StringErrorTest', 'Testing String error is logged');
-    errorHandler('StackTraceErrortest', new Error('Testing Error object is logged'));
 
 
     if (checkLogDir) {
@@ -73,6 +71,7 @@ const expressConfig = (app) => {
 
     if (app.get('env') === 'development') {
         app.use(function(err, req, res, next) {
+            logger.error(err);
             res.status(err.status || 500).send({
                 message: err.message,
                 error: err
@@ -81,6 +80,7 @@ const expressConfig = (app) => {
     }
 
     app.use(function(err, req, res, next) {
+        logger.error(err);
         res.status(err.status || 500).send({
             message: err.message,
             error: {}

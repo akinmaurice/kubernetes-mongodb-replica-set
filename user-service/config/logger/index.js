@@ -2,22 +2,34 @@ const winston = require('winston');
 const moment = require('moment');
 const config = require('../index');
 
-
+const errorStackFormat = winston.format(info => {
+    if (info instanceof Error) {
+      return Object.assign({}, info, {
+        stack: info.stack,
+        message: info.message
+      });
+    }
+    return info;
+  })
+  
 const prettyJson = winston.format.printf(info => {
     let { timestamp } = info;
     timestamp = moment(timestamp).format('YYYY-MM-DD H:mm:ss:SSS');
-    const { level } = info;
-    const { message } = info;
-    return `[${timestamp}]: ${level}: ${message}`;
+    const { level, message, stack } = info;
+    return `[${timestamp}]: ${level}: ${stack || message}`;
 });
 
 const consoleCombineFormat = winston.format.combine(
+    winston.format.errors({ stack: true }),
+    errorStackFormat(),
     winston.format.colorize(),
     winston.format.timestamp(),
     prettyJson
 );
 
 const jsonCombineFormat = winston.format.combine(
+    winston.format.errors({ stack: true }),
+    errorStackFormat(),
     winston.format.timestamp(),
     winston.format.json()
 );
@@ -29,7 +41,12 @@ const logger = () => {
             service: config.SERVICE_NAME,
             env: config.env,
          },
-        transports: [
+        transports: [],
+        exitOnError: false
+    });
+
+    if (config.env === 'development') {
+        ret.add(
             new winston.transports.Console({
                 format: consoleCombineFormat,
                 level: 'debug',
@@ -37,6 +54,8 @@ const logger = () => {
                 json: false,
                 colorize: true
             }),
+        );
+        ret.add(
             new winston.transports.File({
                 format: jsonCombineFormat,
                 level: 'debug',
@@ -45,11 +64,9 @@ const logger = () => {
                 json: true,
                 maxsize: 5242880,
                 maxFiles: 100,
-                colorize: true,
-            })
-        ],
-        exitOnError: false
-    });
+                colorize: false,
+            }));
+    }
 
     ret.stream = {
         write: (message) => {
