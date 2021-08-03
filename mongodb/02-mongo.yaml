@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  selector:
+    matchLabels:
+      app: mongodb
+  serviceName: 'mongodb-headless-service'
+  replicas: 3
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      terminationGracePeriodSeconds: 10
+      # Prevent a Mongo Replica running on the same node as another (avoid single point of failure)
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: mongod
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      securityContext:
+        fsGroup: 1001
+        sysctls: []
+      containers:
+      - name: mongodb
+        image: mongo
+        command:
+          - mongod
+          - "--bind_ip_all"
+          - "--replSet"
+          - rs0
+        env:
+          # Value from Secret
+          - name: MONGODB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: kube-deployment-secret
+                key: init.username
+          # Value from Secret
+          - name: MONGO_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: kube-deployment-secret
+                key: init.password
+          - name: MONGODB_DATABASE
+            # Database Name
+            value: 'kubesetup'
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+          #- name: mongodb-initdb
+            #mountPath: /docker-entrypoint-initdb.d
+          - name: mongodb-volume
+            mountPath: /data/db
+      #volumes:
+        #- name: mongodb-initdb
+          #configMap:
+            #name: mongodb-initdb
+  volumeClaimTemplates:
+    - metadata:
+        name: mongodb-volume
+      spec:
+        accessModes: [ "ReadWriteOnce" ]  
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            storage: 1Gi
+            cpu: 10m
+            memory: 50Mi
+     
