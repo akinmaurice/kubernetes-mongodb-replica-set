@@ -42,13 +42,13 @@ spec:
           - name: MONGODB_USERNAME
             valueFrom:
               secretKeyRef:
-                name: kube-deployment-secret
+                name: mongo-deployment-secret
                 key: init.username
           # Value from Secret
           - name: MONGO_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: kube-deployment-secret
+                name: mongo-deployment-secret
                 key: init.password
           - name: MONGODB_DATABASE
             # Database Name
