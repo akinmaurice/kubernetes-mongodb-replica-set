@@ -6,4 +6,5 @@ module.exports = {
   port: process.env.PORT|| 3023,
   root: path.normalize(`${__dirname}/..`),
   SERVICE_NAME: 'User Service',
+  DATABASE_URI: process.env.DATABASE_URI
 };
