@@ -17,8 +17,8 @@ Execute `minikube status` to confirm minikube is running
 Navigate to your work directory and clone the project, change directory to the `node-api-starter` and add a new remote origin pointing to the new project repo.
 
 ```console
-$ git clone https://github.com/akinmaurice/kube-akin
-$ cd kube-akin
+$ git clone https://github.com/akinmaurice/kubernetes-mongodb-replica-set
+$ cd kubernetes-mongodb-replica-set
 ```
 
 #### Deploying
