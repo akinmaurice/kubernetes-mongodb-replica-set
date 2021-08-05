@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  selector:
+    matchLabels:
+      app: mongodb
+      role: mongodb
+  serviceName: 'mongodb-headless-service'
+  replicas: 3
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: mongodb
+        role: mongodb
+    spec:
+      terminationGracePeriodSeconds: 10
+      serviceAccountName: mongodb-account
+      # Prevent a Mongo Replica running on the same node as another (avoid single point of failure)
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: mongod
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      securityContext:
+        fsGroup: 1001
+        sysctls: []
+      containers:
+      - name: mongodb
+        image: mongo
+        command: ["/bin/sh","-c"]
+        args: ["/home/mongodb/mongodb-data-dir-permission.sh && docker-entrypoint.sh mongod --replSet=rs0 --dbpath=/var/lib/mongodb --bind_ip=0.0.0.0 --keyFile=/var/lib/mongodbkey/mongodb.key"]
+        env:
+          # Value from Secret
+          - name: MONGO_DATA_DIR
+            value: /var/lib/mongodb
+          - name: MONGO_INITDB_ROOT_USERNAME
+            value: root
+          # Value from Secret
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mongo-deployment-secret
+                key: init.password
+          # Value from Secret
+          - name: SECOND_USER_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mongo-deployment-secret
+                key: init.password
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+          - name: mongodb-data
+            mountPath: /var/lib/mongodb
+          - name: mongodb-init
+            mountPath: /docker-entrypoint-initdb.d
+          - name: mongodbpost
+            mountPath: /home/mongodb
+          - name: mongodbkey
+            mountPath: /var/lib/mongodbKeyTemp
+      - name: mongodb-sidecar
+        image: cvallance/mongo-k8s-sidecar:latest
+        env:
+          - name: MONGO_SIDECAR_POD_LABELS
+            value: "role=mongodb"
+          - name: KUBE_NAMESPACE
+            value: 'default'
+          - name: KUBERNETES_MONGO_SERVICE_NAME
+            value: 'mongodb-headless-service'
+          - name: MONGODB_USERNAME
+            value: root
+          - name: MONGODB_DATABASE
+            value: admin
+          - name: MONGODB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mongo-deployment-secret
+                key: init.password
+      volumes:
+        - name: mongodb-init
+          configMap:
+            name: mongodb-init
+            defaultMode: 0755
+        - name: "mongodbpost"
+          configMap:
+            name: "mongodb-scripts"
+            defaultMode: 0755
+        - name: "mongodbkey"
+          configMap:
+            name: "mongodb-key"
+            defaultMode: 0755
+  volumeClaimTemplates:
+    - metadata:
+        name: mongodb-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]  
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            storage: 1Gi
+            cpu: 10m
+            memory: 50Mi
+     
