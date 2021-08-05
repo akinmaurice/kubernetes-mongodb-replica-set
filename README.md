@@ -27,7 +27,9 @@ With minikube running now, cd into the `mongodb` directory in the and execute `k
 
 This should create the replica sets for MongoDb.
 
-Once this is up, cd into the `user-service` and execute `kubectl create -f .` This should create the node api deployment and connect to the mongoDb replica set.
+Execute `kubectl get all` to see all replicas of mongoDb running
+
+Once the Mongodb replicaSet is up, cd into the  `user-service `and execute `kubectl create -f .` This should create the node api deployment and connect to the mongoDb replica set.
 
 ## License
 
