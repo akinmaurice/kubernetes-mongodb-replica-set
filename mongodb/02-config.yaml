@@ -18,9 +18,7 @@ metadata:
 
 data:
   mongodb.key: |
-    ahaksdnqsakdqnajhvckqaafnxasxaxaxmaskdadadsasfsdsdfsf
-    schcacnctcacncuadasdadadfbsasddfbadadwsioweewvaas
-    dfasasakjsvnaa
+    mIt9WmEbjlkKfq8bxhBq62Z7OzApe2HBuJKTscV72bk9zFnvrgMPrOjen9FOs48H6NyNpKNsveVlec4BnO96kDiLFrzKQI2jtkha9G8sPoGIFrazzsys2BZS
 ---
 apiVersion: v1
 kind: ConfigMap
