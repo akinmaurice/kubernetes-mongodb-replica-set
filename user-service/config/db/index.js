@@ -4,11 +4,12 @@ const config = require('../');
 
 mongoose.connect(config.DATABASE_URI, {
     useNewUrlParser: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    useUnifiedTopology: true
 });
 mongoose.Promise = global.Promise;
 
-mongoose.connection.on('connect', function() {
+mongoose.connection.on('connect', () => {
     logger.info('Database has connected successfully');
 });
 
