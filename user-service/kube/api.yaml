@@ -19,7 +19,7 @@ spec:
       containers:
       - name: user-api
         image: akinben/user-service:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
           - name: REDEPLOY_APP
             value: 'REPLACE_BUILD'
