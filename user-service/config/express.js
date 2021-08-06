@@ -6,6 +6,7 @@ const FileStreamRotator = require('file-stream-rotator');
 const httpStatus = require('http-status');
 
 const config = require('./');
+const routes = require('../routes');
 const starterInit = require('./starter');
 const errorHandler = require('./error');
 const loggerInit = require('./logger');
@@ -56,6 +57,7 @@ const expressConfig = (app) => {
             service: config.SERVICE_NAME,
         }));
         
+    app.use('/', routes);
 
 
     app.use((req, res) => Helpers.ResponseHandler(404, res));
