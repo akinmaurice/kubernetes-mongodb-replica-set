@@ -67,7 +67,7 @@ spec:
           periodSeconds: 20
           timeoutSeconds: 5
           successThreshold: 1
-          failureThreshold: 6
+          failureThreshold: 7
         readinessProbe:
           exec:
             command:
@@ -78,7 +78,7 @@ spec:
           periodSeconds: 20
           timeoutSeconds: 5
           successThreshold: 1
-          failureThreshold: 6
+          failureThreshold: 3
         volumeMounts:
           - name: mongodb-data
             mountPath: /var/lib/mongodb
