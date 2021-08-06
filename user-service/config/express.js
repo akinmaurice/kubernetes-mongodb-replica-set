@@ -59,12 +59,6 @@ const expressConfig = (app) => {
         
     app.use('/', routes);
 
-
-    app.use((req, res) => Helpers.ResponseHandler(404, res));
-
-
-    app.use((err, req, res) => Helpers.ResponseHandler(500, res, err));
-
     app.use(function(req, res, next) {
         var err = new Error('Not Found');
         err.status = 404;
