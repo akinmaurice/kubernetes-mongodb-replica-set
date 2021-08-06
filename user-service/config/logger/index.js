@@ -19,12 +19,10 @@ const prettyJson = winston.format.printf(info => {
     return `[${timestamp}]: ${level}: ${stack || message}`;
 });
 
-const consoleCombineFormat = winston.format.combine(
+const combineFormat = winston.format.combine(
     winston.format.errors({ stack: true }),
     errorStackFormat(),
-    winston.format.colorize(),
-    winston.format.timestamp(),
-    prettyJson
+    winston.format.timestamp()
 );
 
 const jsonCombineFormat = winston.format.combine(
@@ -43,14 +41,14 @@ const logger = () => {
             env,
          },
         transports: [],
-        exitOnError: false
+        exitOnError: false,
+        format: combineFormat,
     });
 
     switch (env) {
         case 'production':
             ret.add(
                 new winston.transports.File({
-                    format: jsonCombineFormat,
                     level: 'debug',
                     filename: './server.log',
                     handleExceptions: true,
@@ -58,21 +56,24 @@ const logger = () => {
                     maxsize: 5242880,
                     maxFiles: 100,
                     colorize: false,
+                    format: jsonCombineFormat
                 }));
             break;
         case 'development':
             ret.add(
                 new winston.transports.Console({
-                    format: consoleCombineFormat,
                     level: 'debug',
                     handleExceptions: true,
                     json: false,
-                    colorize: true
+                    colorize: true,
+                    format: winston.format.combine(
+                        winston.format.colorize(),
+                        prettyJson
+                    )
                 }),
             );
             ret.add(
                 new winston.transports.File({
-                    format: jsonCombineFormat,
                     level: 'debug',
                     filename: './server.log',
                     handleExceptions: true,
@@ -80,12 +81,12 @@ const logger = () => {
                     maxsize: 5242880,
                     maxFiles: 100,
                     colorize: false,
+                    format: jsonCombineFormat
                 }));
             break;
         case 'staging':
             ret.add(
                 new winston.transports.File({
-                    format: jsonCombineFormat,
                     level: 'debug',
                     filename: './server.log',
                     handleExceptions: true,
@@ -93,16 +94,20 @@ const logger = () => {
                     maxsize: 5242880,
                     maxFiles: 100,
                     colorize: false,
+                    format: jsonCombineFormat,
                 }));
             break;
         default:
             ret.add(
                 new winston.transports.Console({
-                    format: consoleCombineFormat,
                     level: 'debug',
                     handleExceptions: true,
                     json: false,
-                    colorize: true
+                    colorize: true,
+                    format: winston.format.combine(
+                        winston.format.colorize(),
+                        prettyJson
+                    )
                 }),
             );
 }
