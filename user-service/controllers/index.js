@@ -81,7 +81,6 @@ exports.getUsers = async(req, res) => {
         users
     });
     } catch (error) {
-      console.log(error);
       logger.error(error);
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
         status: httpStatus.INTERNAL_SERVER_ERROR
