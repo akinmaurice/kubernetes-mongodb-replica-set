@@ -1,6 +1,33 @@
 const httpStatus = require('http-status');
+const mongoose = require('mongoose');
 const UserModel = require('../models/User');
+const config = require('../config');
 
+exports.healthCheck = async(req, res) => {
+  try {
+    logger.info('Getting service health');
+    const dbStatus = mongoose.connection.readyState;
+    if (dbStatus === 1) {
+      logger.info('Service health Ok');
+      return res.status(httpStatus.OK).send({ 
+        service: config.SERVICE_NAME,
+        uptime: process.uptime(),
+      });
+    }
+    logger.debug('Service health down', {
+      dbreadyState: dbStatus
+    });
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ 
+      service: config.SERVICE_NAME,
+      uptime: process.uptime(),
+    });
+  } catch (error) {
+      logger.error(error);
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        status: httpStatus.INTERNAL_SERVER_ERROR
+      });
+  }
+};
 
 exports.seedData = async(req, res) => {
   try {
@@ -73,17 +100,17 @@ exports.seedData = async(req, res) => {
 
 exports.getUsers = async(req, res) => {
     try {
-    logger.info('Getting all users');
-    const users = await UserModel.find({});
-    logger.info(`Fetched ${users.length} users`);
-    res.status(httpStatus.OK);
-    return res.json({
-        users
-    });
-    } catch (error) {
-      logger.error(error);
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-        status: httpStatus.INTERNAL_SERVER_ERROR
+      logger.info('Getting all users');
+      const users = await UserModel.find({});
+      logger.info(`Fetched ${users.length} users`);
+      res.status(httpStatus.OK);
+      return res.json({
+          users
       });
+    } catch (error) {
+        logger.error(error);
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+          status: httpStatus.INTERNAL_SERVER_ERROR
+        });
     }
 };

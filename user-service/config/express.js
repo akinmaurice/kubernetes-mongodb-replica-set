@@ -48,14 +48,6 @@ const expressConfig = (app) => {
 
 
     app.use(starterInit.requestId());
-
-
-    app.get(
-        `/health`,
-        (req, res, next) => res.status(httpStatus.OK).send({ 
-            service: config.SERVICE_NAME,
-            uptime: process.uptime(),
-        }));
         
     app.use('/', routes);
 
