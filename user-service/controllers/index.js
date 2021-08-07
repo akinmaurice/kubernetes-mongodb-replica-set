@@ -20,7 +20,7 @@ exports.healthCheck = async(req, res) => {
     }
     return res.status(check ? httpStatus.OK : httpStatus.INTERNAL_SERVER_ERROR).send({ 
       service: config.SERVICE_NAME,
-      status: dbStatus ? 'pass' : 'fail',
+      status: check ? 'available' : 'unavaialble',
       description: `Health of ${config.SERVICE_NAME}`,
       checks: [
         {
