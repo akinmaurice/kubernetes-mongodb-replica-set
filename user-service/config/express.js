@@ -53,8 +53,8 @@ const expressConfig = (app) => {
     app.get(
         `/health`,
         (req, res, next) => res.status(httpStatus.OK).send({ 
-            status: httpStatus.OK,
             service: config.SERVICE_NAME,
+            uptime: process.uptime(),
         }));
         
     app.use('/', routes);
