@@ -5,21 +5,28 @@ const config = require('../config');
 
 exports.healthCheck = async(req, res) => {
   try {
+    let check;
     logger.info('Getting service health');
     const dbStatus = mongoose.connection.readyState;
     if (dbStatus === 1) {
+      check = true;
       logger.info('Service health Ok');
-      return res.status(httpStatus.OK).send({ 
-        service: config.SERVICE_NAME,
+    } else {
+      check = false;
+      logger.debug('Service health down', {
+        dbreadyState: dbStatus,
         uptime: process.uptime(),
       });
     }
-    logger.debug('Service health down', {
-      dbreadyState: dbStatus
-    });
-    return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ 
+    return res.status(check ? httpStatus.OK : httpStatus.INTERNAL_SERVER_ERROR).send({ 
       service: config.SERVICE_NAME,
-      uptime: process.uptime(),
+      status: dbStatus ? 'pass' : 'fail',
+      description: `Health of ${config.SERVICE_NAME}`,
+      checks: [
+        {
+          uptime: process.uptime(),
+        }
+      ]
     });
   } catch (error) {
       logger.error(error);
