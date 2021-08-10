@@ -60,7 +60,7 @@ kind: Service
 metadata:
   name: user-api-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: user-api
   ports:
